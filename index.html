@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Canadian Lara Croft Episodes</title>
+    <style>
+        /* Main layout: flexbox to position list and player side by side */
+        .container {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Episodes list on the left */
+        .episode-list {
+            flex: 1;
+            background-color: #f4f4f4;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        /* Video player on the right */
+        .video-player {
+            flex: 2;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+        }
+
+        /* Episode buttons */
+        .episode-list button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            text-align: left;
+        }
+
+        .episode-list button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script type="text/javascript">
+    function loadEpisodes() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/episodes", true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var data = JSON.parse(xhr.responseText);
+                var episodeListDiv = document.getElementById("episodeList");
+
+                // Clear previous results
+                episodeListDiv.innerHTML = "";
+
+                // Display new results
+                if (data.videos.length > 0) {
+                    for (var i = 0; i < data.videos.length; i++) {
+                        var videoName = data.videos[i];
+
+                        // Create a button to load the video in the player
+                        var videoButton = document.createElement("button");
+                        videoButton.innerText = videoName;
+                        videoButton.onclick = (function(name) {
+                            return function() {
+                                loadVideo(name);
+                            };
+                        })(videoName);
+
+                        episodeListDiv.appendChild(videoButton);
+                    }
+                } else {
+                    episodeListDiv.innerText = "No video files found.";
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    function loadVideo(videoName) {
+        // Set the video source to the stream endpoint
+        var videoPlayer = document.getElementById("videoPlayer");
+        videoPlayer.src = "/stream?video=" + encodeURIComponent(videoName);
+        videoPlayer.load();
+        videoPlayer.play();
+    }
+
+    // Load episodes when the page is loaded
+    window.onload = loadEpisodes;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Left panel: list of episodes -->
+        <div class="episode-list" id="episodeList">
+            Loading episodes...
+        </div>
+
+        <!-- Right panel: video player -->
+        <div class="video-player">
+            <video id="videoPlayer" width="640" height="360" controls>
+                <source type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+</body>
+</html>

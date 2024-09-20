@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Canadian Lara Croft Episodes</title>
+    <script type="text/javascript">
+    function loadEpisodes() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/episodes", true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var data = JSON.parse(xhr.responseText);
+                var resultsDiv = document.getElementById("results");
+
+                // Clear previous results
+                resultsDiv.innerHTML = "";
+
+                // Display new results
+                if (data.videos.length > 0) {
+                    for (var i = 0; i < data.videos.length; i++) {
+                        var videoName = data.videos[i];
+                        var videoURL = "https://archive.org/download/" + data.identifier + "/" + videoName;
+
+                        // Create a link to play the video
+                        var videoLink = document.createElement("a");
+                        videoLink.href = videoURL;
+                        videoLink.innerText = "Watch: " + videoName;
+                        videoLink.target = "_blank"; // Open in a new tab
+
+                        resultsDiv.appendChild(videoLink);
+                        resultsDiv.appendChild(document.createElement("br"));
+                    }
+                } else {
+                    resultsDiv.innerText = "No video files found.";
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    // Load episodes when the page is loaded
+    window.onload = loadEpisodes;
+    </script>
+</head>
+<body>
+    <h1>Canadian Lara Croft Episodes</h1>
+    <div id="results">Loading episodes...</div>
+</body>
+</html>
